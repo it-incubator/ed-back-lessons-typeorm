@@ -1,19 +1,27 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
-import { BaseEntity }                           from '../../../../@core/entities/base.entity';
-import { User }                                 from './user.entity';
+import { BaseEntity }                           from 'src/@core/entities/base.entity';
 
-enum AccountPlan {
-  Free,
-  Paid,
+import type { User }                            from './user.entity';
+
+enum AccountType {
+  facebook = 'facebook',
+  google = 'google',
 }
 
 @Entity()
 export class Account extends BaseEntity {
-  @Column('enum', { enum: AccountPlan, default: AccountPlan.Free })
-  public plan: AccountPlan;
+  @Column({ type: 'enum', enum: AccountType, default: AccountType.facebook })
+  public accountType: AccountType;
 
-  @OneToOne(() => User, (user: User) => user.account)
-  @JoinColumn()
-  public owner: User;
+  @OneToOne('User')
+  // @JoinColumn([
+  //   { referencedColumnName: 'email', name: 'email' },
+  //   { referencedColumnName: 'username', name: 'username' },
+  // ])
+  @JoinColumn({
+    referencedColumnName: 'email',
+    foreignKeyConstraintName: 'user_email',
+  })
+  public user: User;
 }
