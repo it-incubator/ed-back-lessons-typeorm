@@ -7,7 +7,6 @@ import { Comment }          from 'src/modules/comments/domain/entities/comment.e
 import { CreateCommentDto } from '../../application/dtos/create-comment.dto';
 import { CreatePostDto }    from '../../application/dtos/create-post.dto';
 import { Post }             from '../../domain/entities/post.entity';
-import { UpdatePostDto }    from '../../application/dtos/update-post.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -47,32 +46,13 @@ export class PostsRepository {
     }
   }
 
-  public async findByTitle(
-    title: string,
-    // { size, page }: { size: number; page: number } = { size: 1, page: 2 },
-  ): Promise<[Post[], number]> {
+  public async findByTitle(title: string): Promise<[Post[], number]> {
     try {
       const result = await this.posts
         .createQueryBuilder('p')
-        // .createQueryBuilder()
-        // .where('title = :title', { title })
-        // .leftJoin('p.author', 'a')
-        .leftJoinAndSelect('p.author', 'a')
-        // .leftJoinAndMapOne('p.postAuthor', 'p.author', 'a')
-        // .select(['p.title', 'a.username'])
-        // .select('a.*')
-        // .skip((page - 1) * size)
-        // .take(size)
+        .where('p.title = :title', { title })
+        // .leftJoinAndSelect('p.author', 'a')
         .getManyAndCount();
-
-      // const rawData = await this.posts
-      //   .createQueryBuilder('p')
-      //   .leftJoinAndSelect('p.author', 'a')
-      //   .select(['p.title', 'a.username'])
-      //   .addSelect('SUM(2 + 2)', 'sum')
-      //   .getRawMany();
-
-      // console.log(rawData);
 
       return result;
     } catch (error) {
@@ -82,26 +62,15 @@ export class PostsRepository {
     }
   }
 
-  public async update(id: number, data: UpdatePostDto): Promise<void> {
-    try {
-      const result = await this.posts
-        .createQueryBuilder()
-        .update()
-        .set(data)
-        .where('id = :id', { id })
-        .orWhere('authorId = :authorId', { authorId: 44 })
-        .execute();
-
-      console.log(result);
-    } catch (error) {
-      console.log(error);
-
-      return null;
-    }
-  }
-
   public async create(data: CreatePostDto): Promise<Post> {
     try {
+      await this.posts
+        .createQueryBuilder()
+        .update(Post)
+        .set({ title: 'Timber', content: 'Saw' })
+        .where('id = :id', { id: 1 })
+        .andWhere('id = :id2', { id2: 2 })
+        .execute();
       const result = await this.posts.save(data);
 
       return result;
