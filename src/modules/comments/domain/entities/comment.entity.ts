@@ -6,6 +6,9 @@ import type { User }                                         from '../../../user
 
 @Entity()
 export class Comment extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  public id: number;
+
   @Column()
   public text: string;
 
